@@ -1,5 +1,6 @@
 package com.example.libraryapp.controller;
 
+import com.example.libraryapp.entity.Book;
 import com.example.libraryapp.entity.Student;
 import com.example.libraryapp.service.impl.LibraryImpl;
 import com.example.libraryapp.utils.ResponseApi;
@@ -19,5 +20,10 @@ public class LibraryController {
     @PostMapping("create-student")
     public ResponseEntity<ResponseApi> createStudent(@RequestBody Student student) {
         return library.createStudent(student);
+    }
+
+    @PostMapping("create-book")
+    public ResponseEntity<ResponseApi> createBook(@RequestBody Book book) {
+        return library.createBook(book);
     }
 }

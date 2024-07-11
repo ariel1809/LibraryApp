@@ -61,7 +61,36 @@ public class LibraryImpl implements LibraryApi {
 
     @Override
     public ResponseEntity<ResponseApi> createBook(Book book) {
-        return null;
+        try {
+
+            if (book == null){
+                responseApi.setMessage("Book is null");
+                responseApi.setCode(CodeEnum.NULL.getCode());
+                responseApi.setData(null);
+                return new ResponseEntity<>(responseApi, HttpStatus.BAD_REQUEST);
+            }
+
+            Book savedBook = new Book();
+            savedBook.setAuthor(book.getAuthor());
+            savedBook.setTitle(book.getTitle());
+            savedBook.setIsbn(book.getIsbn());
+            savedBook.setPrice(book.getPrice());
+            savedBook.setPages(book.getPages());
+            savedBook.setNbrCopies(book.getNbrCopies());
+            savedBook = bookRepository.save(savedBook);
+
+            responseApi.setMessage("Book created");
+            responseApi.setCode(CodeEnum.SUCCESS.getCode());
+            responseApi.setData(savedBook);
+            return new ResponseEntity<>(responseApi, HttpStatus.CREATED);
+
+        }catch (Exception e){
+            responseApi.setCode(CodeEnum.ERROR.getCode());
+            responseApi.setMessage(e.getMessage());
+            responseApi.setData(null);
+
+            return new ResponseEntity<>(responseApi, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override

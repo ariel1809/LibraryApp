@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @ToString
 @Getter
 @Setter
-@Document
+@Document(collection = "books")
 public class Book {
     @EqualsAndHashCode.Include
     private String id;
