@@ -28,4 +28,9 @@ public class LibraryController {
     public ResponseEntity<ResponseApi> borrowBook(@RequestParam String bookId, @RequestParam String studentId){
         return library.borrowBook(bookId, studentId);
     }
+
+    @PostMapping("return-book")
+    public ResponseEntity<ResponseApi> returnBook(@RequestParam String bookId, @RequestParam String idBorrow){
+        return library.returnBook(bookId, idBorrow);
+    }
 }
