@@ -134,6 +134,12 @@ public class LibraryImpl implements LibraryApi {
                 responseApi.setData(null);
                 return new ResponseEntity<>(responseApi, HttpStatus.BAD_REQUEST);
             }
+            if (book.getNbrCopies() == 0){
+                responseApi.setMessage("Book has no copies");
+                responseApi.setCode(CodeEnum.NULL.getCode());
+                responseApi.setData(null);
+                return new ResponseEntity<>(responseApi, HttpStatus.BAD_REQUEST);
+            }
             book.setNbrCopies(book.getNbrCopies() - 1);
             book = bookRepository.save(book);
             List<Book> books = new ArrayList<>();
