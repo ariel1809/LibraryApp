@@ -1,6 +1,7 @@
 package com.example.libraryapp.service.impl;
 
 import com.example.libraryapp.entity.Book;
+import com.example.libraryapp.entity.Loan;
 import com.example.libraryapp.entity.Student;
 import com.example.libraryapp.repository.BookRepository;
 import com.example.libraryapp.repository.LoanRepository;
@@ -12,6 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class LibraryImpl implements LibraryApi {
@@ -95,6 +100,63 @@ public class LibraryImpl implements LibraryApi {
 
     @Override
     public ResponseEntity<ResponseApi> borrowBook(String idBook, String idStudent) {
-        return null;
+        try {
+
+            if (idStudent == null){
+                responseApi.setMessage("Student not found");
+                responseApi.setCode(CodeEnum.NULL.getCode());
+                responseApi.setData(null);
+                return new ResponseEntity<>(responseApi, HttpStatus.BAD_REQUEST);
+            }
+            Student student = studentRepository.findById(idStudent).orElse(null);
+            if (student == null){
+                responseApi.setMessage("Student not found");
+                responseApi.setCode(CodeEnum.NULL.getCode());
+                responseApi.setData(null);
+                return new ResponseEntity<>(responseApi, HttpStatus.BAD_REQUEST);
+            }
+            if (student.getNbrLoans() > 3){
+                responseApi.setMessage("Student has more than 03 loans");
+                responseApi.setCode(CodeEnum.NULL.getCode());
+                responseApi.setData(null);
+                return new ResponseEntity<>(responseApi, HttpStatus.BAD_REQUEST);
+            }
+            if (idBook == null){
+                responseApi.setMessage("Book not found");
+                responseApi.setCode(CodeEnum.NULL.getCode());
+                responseApi.setData(null);
+                return new ResponseEntity<>(responseApi, HttpStatus.BAD_REQUEST);
+            }
+            Book book = bookRepository.findById(idBook).orElse(null);
+            if (book == null){
+                responseApi.setMessage("Book is null");
+                responseApi.setCode(CodeEnum.NULL.getCode());
+                responseApi.setData(null);
+                return new ResponseEntity<>(responseApi, HttpStatus.BAD_REQUEST);
+            }
+            book.setNbrCopies(book.getNbrCopies() - 1);
+            book = bookRepository.save(book);
+            List<Book> books = new ArrayList<>();
+            books.add(book);
+
+            student.setNbrLoans(student.getNbrLoans() + 1);
+            student = studentRepository.save(student);
+            Loan loan = new Loan();
+            loan.setStudent(student);
+            loan.setBooks(books);
+            loan.setStartDate(LocalDate.now());
+            loan.setEndDate(LocalDate.now().plusDays(15));
+            loan = loanRepository.save(loan);
+            responseApi.setMessage("Student borrowed");
+            responseApi.setCode(CodeEnum.SUCCESS.getCode());
+            responseApi.setData(loan);
+            return new ResponseEntity<>(responseApi, HttpStatus.CREATED);
+
+        }catch (Exception e){
+            responseApi.setCode(CodeEnum.ERROR.getCode());
+            responseApi.setMessage(e.getMessage());
+            responseApi.setData(null);
+            return new ResponseEntity<>(responseApi, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

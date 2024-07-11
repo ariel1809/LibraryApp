@@ -13,7 +13,7 @@ import java.util.List;
 @ToString
 @Getter
 @Setter
-@Document
+@Document(collection = "loans")
 public class Loan {
     @EqualsAndHashCode.Include
     private String id;
