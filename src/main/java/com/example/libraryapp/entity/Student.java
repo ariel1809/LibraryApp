@@ -26,7 +26,7 @@ public class Student {
     @EqualsAndHashCode.Exclude
     private String email;
     @EqualsAndHashCode.Exclude
-    private int nbrLoans;
+    private Integer nbrLoans;
     @EqualsAndHashCode.Exclude
-    private int penalty;
+    private Integer penalty;
 }

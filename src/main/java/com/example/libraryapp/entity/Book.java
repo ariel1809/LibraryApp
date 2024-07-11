@@ -20,9 +20,9 @@ public class Book {
     @EqualsAndHashCode.Exclude
     private String isbn;
     @EqualsAndHashCode.Exclude
-    private int pages;
+    private Integer pages;
     @EqualsAndHashCode.Exclude
-    private int price;
+    private Integer price;
     @EqualsAndHashCode.Exclude
-    private int nbrCopies;
+    private Integer nbrCopies;
 }
