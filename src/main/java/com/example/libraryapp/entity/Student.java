@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @ToString
 @Getter
 @Setter
+@EqualsAndHashCode
 @Document
 public class Student {
     @EqualsAndHashCode.Include

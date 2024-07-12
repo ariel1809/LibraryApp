@@ -148,6 +148,18 @@ public class LibraryImpl implements LibraryApi {
 
             student.setNbrLoans(student.getNbrLoans() + 1);
             student = studentRepository.save(student);
+            Loan loan1 = loanRepository.findByStudent(student).orElse(null);
+            if (loan1 != null && loan1.getStudent().equals(student)){
+                System.out.println("ok");
+                loan1.setBooks(books);
+                loan1.setStartDate(LocalDate.now());
+                loan1.setEndDate(LocalDate.now().plusDays(15));
+                loan1 = loanRepository.save(loan1);
+                responseApi.setMessage("Student borrowed");
+                responseApi.setCode(CodeEnum.SUCCESS.getCode());
+                responseApi.setData(loan1);
+                return new ResponseEntity<>(responseApi, HttpStatus.CREATED);
+            }
             Loan loan = new Loan();
             loan.setStudent(student);
             loan.setBooks(books);
@@ -202,6 +214,8 @@ public class LibraryImpl implements LibraryApi {
                 return new ResponseEntity<>(responseApi, HttpStatus.BAD_REQUEST);
             }
             loan.getBooks().remove(book);
+            loan.setStartDate(null);
+            loan.setEndDate(null);
             book.setNbrCopies(book.getNbrCopies() + 1);
             bookRepository.save(book);
             student.setNbrLoans(student.getNbrLoans() - 1);
