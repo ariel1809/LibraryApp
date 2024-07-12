@@ -4,6 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @ToString
@@ -13,6 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class Student {
     @EqualsAndHashCode.Include
+    @Id
     private String id;
     @EqualsAndHashCode.Exclude
     private String name;

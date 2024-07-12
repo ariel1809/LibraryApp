@@ -8,24 +8,18 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @ToString
 @Getter
 @Setter
+@Document(collection = "loan_histories")
 @EqualsAndHashCode
-@Document(collection = "loans")
-public class Loan {
+public class LoanHistory {
     @EqualsAndHashCode.Include
     private String id;
     @EqualsAndHashCode.Exclude
     @DBRef
-    private Student student;
+    private LoanBook loanBook;
     @EqualsAndHashCode.Exclude
-    @DBRef
-    private List<LoanBook> loanBooks = new ArrayList<>();
-    @EqualsAndHashCode.Exclude
-    @DBRef
-    List<LoanHistory> loanHistories = new ArrayList<>();
+    LocalDate returnDate;
 }
