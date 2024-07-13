@@ -15,7 +15,6 @@ import java.util.Objects;
 @Getter
 @Setter
 @Document(collection = "loan_books")
-@EqualsAndHashCode
 public class LoanBook {
     @EqualsAndHashCode.Include
     @Id

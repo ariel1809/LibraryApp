@@ -11,7 +11,6 @@ import java.util.Objects;
 @ToString
 @Getter
 @Setter
-@EqualsAndHashCode
 @Document(collection = "books")
 public class Book {
     @EqualsAndHashCode.Include
