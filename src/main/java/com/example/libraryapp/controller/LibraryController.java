@@ -33,4 +33,9 @@ public class LibraryController {
     public ResponseEntity<ResponseApi> returnBook(@RequestParam String bookId, @RequestParam String idBorrow){
         return library.returnBook(bookId, idBorrow);
     }
+
+    @PostMapping("list-book")
+    public ResponseEntity<ResponseApi> listBook(){
+        return library.getAllBooks();
+    }
 }

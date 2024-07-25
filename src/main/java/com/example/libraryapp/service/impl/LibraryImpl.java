@@ -5,7 +5,7 @@ import com.example.libraryapp.repository.*;
 import com.example.libraryapp.service.api.LibraryApi;
 import com.example.libraryapp.utils.CodeEnum;
 import com.example.libraryapp.utils.ResponseApi;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @Service
 public class LibraryImpl implements LibraryApi {
@@ -29,7 +30,7 @@ public class LibraryImpl implements LibraryApi {
     private LoanBookRepository loanBookRepository;
 
     private final ResponseApi responseApi = new ResponseApi();
-    private static final Logger LOGGER = (Logger) LoggerFactory.getLogger(LibraryImpl.class);
+    private static final Logger logger =  LoggerFactory.getLogger(LibraryImpl.class);
 
     @Override
     public ResponseEntity<ResponseApi> createStudent(Student student) {
@@ -58,7 +59,7 @@ public class LibraryImpl implements LibraryApi {
             return new ResponseEntity<>(responseApi, HttpStatus.CREATED);
 
         }catch (Exception e){
-            LOGGER.error("An error occurred while returning the book", e);
+            logger.error("An error occurred while returning the book", e);
             responseApi.setCode(CodeEnum.ERROR.getCode());
             responseApi.setMessage(e.getMessage());
             responseApi.setData(null);
@@ -81,9 +82,9 @@ public class LibraryImpl implements LibraryApi {
             Book savedBook = new Book();
             savedBook.setAuthor(book.getAuthor());
             savedBook.setTitle(book.getTitle());
-            savedBook.setIsbn(book.getIsbn());
-            savedBook.setPrice(book.getPrice());
-            savedBook.setPages(book.getPages());
+            savedBook.setAmount(book.getAmount());
+            savedBook.setRating(book.getRating());
+            savedBook.setConsultation(book.getConsultation());
             savedBook.setNbrCopies(book.getNbrCopies());
             savedBook = bookRepository.save(savedBook);
 
@@ -245,6 +246,31 @@ public class LibraryImpl implements LibraryApi {
             responseApi.setCode(CodeEnum.SUCCESS.getCode());
             responseApi.setData(loan);
             return new ResponseEntity<>(responseApi, HttpStatus.CREATED);
+
+        }catch (Exception e){
+            e.printStackTrace();
+            responseApi.setCode(CodeEnum.ERROR.getCode());
+            responseApi.setMessage(e.getMessage());
+            responseApi.setData(null);
+            return new ResponseEntity<>(responseApi, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public ResponseEntity<ResponseApi> getAllBooks() {
+        try {
+
+            List<Book> books = bookRepository.findAll();
+            if (books.isEmpty()){
+                responseApi.setMessage("No books found");
+                responseApi.setCode(CodeEnum.NULL.getCode());
+                responseApi.setData(null);
+                return new ResponseEntity<>(responseApi, HttpStatus.BAD_REQUEST);
+            }
+            responseApi.setMessage("Books found");
+            responseApi.setCode(CodeEnum.SUCCESS.getCode());
+            responseApi.setData(books);
+            return new ResponseEntity<>(responseApi, HttpStatus.OK);
 
         }catch (Exception e){
             e.printStackTrace();

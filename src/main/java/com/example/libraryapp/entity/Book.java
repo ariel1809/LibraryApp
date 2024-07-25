@@ -16,15 +16,19 @@ public class Book {
     @EqualsAndHashCode.Include
     private String id;
     @EqualsAndHashCode.Exclude
+    private String image;
+    @EqualsAndHashCode.Exclude
     private String title;
     @EqualsAndHashCode.Exclude
     private String author;
     @EqualsAndHashCode.Exclude
-    private String isbn;
+    private String categorie;
     @EqualsAndHashCode.Exclude
-    private Integer pages;
+    private String consultation;
     @EqualsAndHashCode.Exclude
-    private Integer price;
+    private String rating;
+    @EqualsAndHashCode.Exclude
+    private String amount;
     @EqualsAndHashCode.Exclude
     private Integer nbrCopies;
 
