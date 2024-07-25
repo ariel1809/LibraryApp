@@ -30,13 +30,20 @@ public class LibraryController {
     }
 
     @PostMapping("return-book")
-    public ResponseEntity<ResponseApi> returnBook(@RequestParam String bookId, @RequestParam String idBorrow){
-        return library.returnBook(bookId, idBorrow);
+    public ResponseEntity<ResponseApi> returnBook(@RequestParam String bookId, @RequestParam String studentId){
+        return library.returnBook(bookId, studentId);
     }
 
     @PostMapping("list-book")
     public ResponseEntity<ResponseApi> listBook(@RequestParam(defaultValue = "0") int page,
                                                 @RequestParam(defaultValue = "10") int size){
         return library.getAllBooks(page, size);
+    }
+
+    @PostMapping("list-loan-book")
+    public ResponseEntity<ResponseApi> listLoanBook(@RequestParam(defaultValue = "0") int page,
+                                                    @RequestParam(defaultValue = "10") int size,
+                                                    @RequestParam String idStudent){
+        return library.listReturnedBooksByStudent(page, size, idStudent);
     }
 }

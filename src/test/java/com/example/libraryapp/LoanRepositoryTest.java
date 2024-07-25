@@ -23,6 +23,5 @@ public class LoanRepositoryTest {
         Student student = studentRepository.findById(studentId).orElse(null);
         Optional<Loan> loan = loanRepository.findByStudent(student);
         System.out.println(loan.get());
-        assert loan.isPresent() : "Loan should be present for the given student ID";
     }
 }

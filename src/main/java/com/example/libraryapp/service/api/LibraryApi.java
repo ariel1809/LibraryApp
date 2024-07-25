@@ -11,6 +11,7 @@ public interface LibraryApi {
     ResponseEntity<ResponseApi> createStudent(Student student);
     ResponseEntity<ResponseApi> createBook(Book book);
     ResponseEntity<ResponseApi> borrowBook(String idBook, String idStudent);
-    ResponseEntity<ResponseApi> returnBook(String idBook, String idBorrow);
+    ResponseEntity<ResponseApi> returnBook(String idBook, String idStudent);
     ResponseEntity<ResponseApi> getAllBooks(int page, int size);
+    ResponseEntity<ResponseApi> listReturnedBooksByStudent(int page, int size, String idStudent);
 }

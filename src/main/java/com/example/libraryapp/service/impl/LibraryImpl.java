@@ -9,11 +9,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
@@ -31,7 +33,8 @@ public class LibraryImpl implements LibraryApi {
     private LoanBookRepository loanBookRepository;
 
     private final ResponseApi responseApi = new ResponseApi();
-    private static final Logger logger =  LoggerFactory.getLogger(LibraryImpl.class);
+    private static final Logger LOGGER =  LoggerFactory.getLogger(LibraryImpl.class);
+    private static final ZoneId ZONE_ID = ZoneId.systemDefault();
 
     @Override
     public ResponseEntity<ResponseApi> createStudent(Student student) {
@@ -60,7 +63,7 @@ public class LibraryImpl implements LibraryApi {
             return new ResponseEntity<>(responseApi, HttpStatus.CREATED);
 
         }catch (Exception e){
-            logger.error("An error occurred while returning the book", e);
+            LOGGER.error("An error occurred while returning the book", e);
             responseApi.setCode(CodeEnum.ERROR.getCode());
             responseApi.setMessage(e.getMessage());
             responseApi.setData(null);
@@ -95,7 +98,7 @@ public class LibraryImpl implements LibraryApi {
             return new ResponseEntity<>(responseApi, HttpStatus.CREATED);
 
         }catch (Exception e){
-            e.printStackTrace();
+            LOGGER.error("An error occurred while returning the book", e);
             responseApi.setCode(CodeEnum.ERROR.getCode());
             responseApi.setMessage(e.getMessage());
             responseApi.setData(null);
@@ -156,10 +159,14 @@ public class LibraryImpl implements LibraryApi {
             if (loan1 != null && loan1.getStudent().equals(student)){
                 System.out.println("ok");
                 loanBook.setBook(book);
-                loanBook.setLoanDate(LocalDate.now());
-                loanBook.setReturnDate(LocalDate.now().plusDays(15));
+                loanBook.setLoanDate(LocalDate.now(ZONE_ID));
+                loanBook.setReturnDate(LocalDate.now(ZONE_ID).plusDays(15));
                 loanBook = loanBookRepository.save(loanBook);
                 loan1.getLoanBooks().add(loanBook);
+                LoanHistory loanHistory = new LoanHistory();
+                loanHistory.setLoanBook(loanBook);
+                loanHistory = loanHistoryRepository.save(loanHistory);
+                loan1.getLoanHistories().add(loanHistory);
                 loan1 = loanRepository.save(loan1);
                 responseApi.setMessage("Student borrowed");
                 responseApi.setCode(CodeEnum.SUCCESS.getCode());
@@ -168,17 +175,13 @@ public class LibraryImpl implements LibraryApi {
             }
             LoanHistory loanHistory = new LoanHistory();
             loanBook.setBook(book);
-            loanBook.setLoanDate(LocalDate.now());
-            loanBook.setReturnDate(LocalDate.now().plusDays(15));
+            loanBook.setLoanDate(LocalDate.now(ZONE_ID));
+            loanBook.setReturnDate(LocalDate.now(ZONE_ID).plusDays(15));
             loanBook = loanBookRepository.save(loanBook);
             loanHistory.setLoanBook(loanBook);
             loanHistory = loanHistoryRepository.save(loanHistory);
             Loan loan = new Loan();
             loan.setStudent(student);
-            loanBook.setBook(book);
-            loanBook.setLoanDate(LocalDate.now());
-            loanBook.setReturnDate(LocalDate.now().plusDays(15));
-            loanBook = loanBookRepository.save(loanBook);
             loan.getLoanBooks().add(loanBook);
             loan.getLoanHistories().add(loanHistory);
             loan = loanRepository.save(loan);
@@ -188,7 +191,7 @@ public class LibraryImpl implements LibraryApi {
             return new ResponseEntity<>(responseApi, HttpStatus.CREATED);
 
         }catch (Exception e){
-            e.printStackTrace();
+            LOGGER.error("An error occurred while returning the book", e);
             responseApi.setCode(CodeEnum.ERROR.getCode());
             responseApi.setMessage(e.getMessage());
             responseApi.setData(null);
@@ -197,16 +200,23 @@ public class LibraryImpl implements LibraryApi {
     }
 
     @Override
-    public ResponseEntity<ResponseApi> returnBook(String idLoanBook, String idBorrow) {
+    public ResponseEntity<ResponseApi> returnBook(String idLoanBook, String idStudent) {
         try {
 
-            if (idBorrow == null){
-                responseApi.setMessage("Borrow not found");
+            if (idStudent == null){
+                responseApi.setMessage("Student not found");
                 responseApi.setCode(CodeEnum.NULL.getCode());
                 responseApi.setData(null);
                 return new ResponseEntity<>(responseApi, HttpStatus.BAD_REQUEST);
             }
-            Loan loan = loanRepository.findById(idBorrow).orElse(null);
+            Student student = studentRepository.findById(idStudent).orElse(null);
+            if (student == null){
+                responseApi.setMessage("Student not found");
+                responseApi.setCode(CodeEnum.NULL.getCode());
+                responseApi.setData(null);
+                return new ResponseEntity<>(responseApi, HttpStatus.BAD_REQUEST);
+            }
+            Loan loan = loanRepository.findByStudent(student).orElse(null);
             if (loan == null){
                 responseApi.setMessage("Borrow is null");
                 responseApi.setCode(CodeEnum.NULL.getCode());
@@ -226,14 +236,19 @@ public class LibraryImpl implements LibraryApi {
                 responseApi.setData(null);
                 return new ResponseEntity<>(responseApi, HttpStatus.BAD_REQUEST);
             }
-            Student student = loan.getStudent();
+            if (!loan.getLoanBooks().contains(loanBook)){
+                responseApi.setMessage("Loan book does not exist");
+                responseApi.setCode(CodeEnum.NULL.getCode());
+                responseApi.setData(null);
+                return new ResponseEntity<>(responseApi, HttpStatus.BAD_REQUEST);
+            }
             if (loanBook.getReturnDate().isBefore(LocalDate.now())){
                 student.setPenalty((int) ChronoUnit.DAYS.between(loanBook.getReturnDate(), LocalDate.now()));
             }
             LoanHistory loanHistory = loanHistoryRepository.findByLoanBook(loanBook).orElse(null);
             if (loanHistory != null){
                 System.out.println("ok");
-                loanHistory.setReturnDate(LocalDate.now());
+                loanHistory.setReturnDate(LocalDate.now(ZONE_ID));
                 loanHistoryRepository.save(loanHistory);
             }
             loan.getLoanBooks().remove(loanBook);
@@ -249,7 +264,7 @@ public class LibraryImpl implements LibraryApi {
             return new ResponseEntity<>(responseApi, HttpStatus.CREATED);
 
         }catch (Exception e){
-            e.printStackTrace();
+            LOGGER.error("An error occurred while returning the book", e);
             responseApi.setCode(CodeEnum.ERROR.getCode());
             responseApi.setMessage(e.getMessage());
             responseApi.setData(null);
@@ -274,7 +289,52 @@ public class LibraryImpl implements LibraryApi {
             return new ResponseEntity<>(responseApi, HttpStatus.OK);
 
         }catch (Exception e){
-            e.printStackTrace();
+            LOGGER.error("An error occurred while returning the book", e);
+            responseApi.setCode(CodeEnum.ERROR.getCode());
+            responseApi.setMessage(e.getMessage());
+            responseApi.setData(null);
+            return new ResponseEntity<>(responseApi, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public ResponseEntity<ResponseApi> listReturnedBooksByStudent(int page, int size, String idStudent) {
+        try {
+
+            Pageable pageable = PageRequest.of(page, size);
+            if (idStudent == null){
+                responseApi.setMessage("Student not found");
+                responseApi.setCode(CodeEnum.NULL.getCode());
+                responseApi.setData(null);
+                return new ResponseEntity<>(responseApi, HttpStatus.BAD_REQUEST);
+            }
+            Student student = studentRepository.findById(idStudent).orElse(null);
+            if (student == null){
+                responseApi.setMessage("Student not found");
+                responseApi.setCode(CodeEnum.NULL.getCode());
+                responseApi.setData(null);
+                return new ResponseEntity<>(responseApi, HttpStatus.BAD_REQUEST);
+            }
+            Loan loan = loanRepository.findByStudent(student).orElse(null);
+            if (loan == null){
+                responseApi.setMessage("Loan not found");
+                responseApi.setCode(CodeEnum.NULL.getCode());
+                responseApi.setData(null);
+                return new ResponseEntity<>(responseApi, HttpStatus.BAD_REQUEST);
+            }
+            if (loan.getLoanBooks().isEmpty()){
+                responseApi.setMessage("No books found");
+                responseApi.setCode(CodeEnum.NULL.getCode());
+                responseApi.setData(null);
+                return new ResponseEntity<>(responseApi, HttpStatus.BAD_REQUEST);
+            }
+            responseApi.setMessage("Books found");
+            responseApi.setCode(CodeEnum.SUCCESS.getCode());
+            responseApi.setData(loanRepository.findByStudent(student, pageable).getContent());
+            return new ResponseEntity<>(responseApi, HttpStatus.OK);
+
+        }catch (Exception e){
+            LOGGER.error("An error occurred while returning the book", e);
             responseApi.setCode(CodeEnum.ERROR.getCode());
             responseApi.setMessage(e.getMessage());
             responseApi.setData(null);
