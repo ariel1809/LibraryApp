@@ -35,7 +35,8 @@ public class LibraryController {
     }
 
     @PostMapping("list-book")
-    public ResponseEntity<ResponseApi> listBook(){
-        return library.getAllBooks();
+    public ResponseEntity<ResponseApi> listBook(@RequestParam(defaultValue = "0") int page,
+                                                @RequestParam(defaultValue = "10") int size){
+        return library.getAllBooks(page, size);
     }
 }
