@@ -14,4 +14,5 @@ public interface LibraryApi {
     ResponseEntity<ResponseApi> returnBook(String idBook, String idStudent);
     ResponseEntity<ResponseApi> getAllBooks(int page, int size);
     ResponseEntity<ResponseApi> listReturnedBooksByStudent(int page, int size, String idStudent);
+    ResponseEntity<ResponseApi> getAllStudents(int page, int size);
 }

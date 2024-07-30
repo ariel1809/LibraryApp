@@ -26,5 +26,5 @@ public class Loan {
     private List<LoanBook> loanBooks = new ArrayList<>();
     @EqualsAndHashCode.Exclude
     @DBRef
-    List<LoanHistory> loanHistories = new ArrayList<>();
+    private List<LoanHistory> loanHistories = new ArrayList<>();
 }

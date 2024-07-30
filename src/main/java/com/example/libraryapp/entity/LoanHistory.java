@@ -21,5 +21,5 @@ public class LoanHistory {
     @DBRef
     private LoanBook loanBook;
     @EqualsAndHashCode.Exclude
-    LocalDate returnDate;
+    private LocalDate returnDate;
 }

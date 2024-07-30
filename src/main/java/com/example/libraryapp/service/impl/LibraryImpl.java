@@ -153,17 +153,16 @@ public class LibraryImpl implements LibraryApi {
             book = bookRepository.save(book);
 
             LoanBook loanBook = new LoanBook();
+            LoanHistory loanHistory = new LoanHistory();
             student.setNbrLoans(student.getNbrLoans() + 1);
             student = studentRepository.save(student);
             Loan loan1 = loanRepository.findByStudent(student).orElse(null);
             if (loan1 != null && loan1.getStudent().equals(student)){
-                System.out.println("ok");
                 loanBook.setBook(book);
                 loanBook.setLoanDate(LocalDate.now(ZONE_ID));
                 loanBook.setReturnDate(LocalDate.now(ZONE_ID).plusDays(15));
                 loanBook = loanBookRepository.save(loanBook);
                 loan1.getLoanBooks().add(loanBook);
-                LoanHistory loanHistory = new LoanHistory();
                 loanHistory.setLoanBook(loanBook);
                 loanHistory = loanHistoryRepository.save(loanHistory);
                 loan1.getLoanHistories().add(loanHistory);
@@ -173,7 +172,6 @@ public class LibraryImpl implements LibraryApi {
                 responseApi.setData(loan1);
                 return new ResponseEntity<>(responseApi, HttpStatus.CREATED);
             }
-            LoanHistory loanHistory = new LoanHistory();
             loanBook.setBook(book);
             loanBook.setLoanDate(LocalDate.now(ZONE_ID));
             loanBook.setReturnDate(LocalDate.now(ZONE_ID).plusDays(15));
@@ -331,6 +329,31 @@ public class LibraryImpl implements LibraryApi {
             responseApi.setMessage("Books found");
             responseApi.setCode(CodeEnum.SUCCESS.getCode());
             responseApi.setData(loanRepository.findByStudent(student, pageable).getContent());
+            return new ResponseEntity<>(responseApi, HttpStatus.OK);
+
+        }catch (Exception e){
+            LOGGER.error("An error occurred while returning the book", e);
+            responseApi.setCode(CodeEnum.ERROR.getCode());
+            responseApi.setMessage(e.getMessage());
+            responseApi.setData(null);
+            return new ResponseEntity<>(responseApi, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public ResponseEntity<ResponseApi> getAllStudents(int page, int size) {
+        try {
+
+            List<Student> students = studentRepository.findAll(PageRequest.of(page, size)).getContent();
+            if (students.isEmpty()){
+                responseApi.setMessage("No students found");
+                responseApi.setCode(CodeEnum.NULL.getCode());
+                responseApi.setData(null);
+                return new ResponseEntity<>(responseApi, HttpStatus.BAD_REQUEST);
+            }
+            responseApi.setMessage("Students found");
+            responseApi.setCode(CodeEnum.SUCCESS.getCode());
+            responseApi.setData(students);
             return new ResponseEntity<>(responseApi, HttpStatus.OK);
 
         }catch (Exception e){
