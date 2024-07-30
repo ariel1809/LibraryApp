@@ -1,0 +1,67 @@
+openapi: 3.1.0
+info:
+  description: libraryApp API
+  title: libraryApp API
+  version: 1.0.0
+servers:
+- url: https://libraryApp
+paths:
+  /create-student:
+    post:
+      operationId: createStudent
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Student'
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ResponseApi'
+          description: OK
+      summary: POST create-student
+      x-content-type: application/json
+      x-accepts: '*/*'
+components:
+  schemas:
+    Student:
+      example:
+        gender: ""
+        phone: ""
+        surname: ""
+        penalty: ""
+        name: ""
+        nbrLoans: ""
+        id: ""
+        age: ""
+        email: ""
+      properties:
+        id: {}
+        name: {}
+        surname: {}
+        age:
+          format: int32
+        gender: {}
+        phone: {}
+        email: {}
+        nbrLoans:
+          format: int32
+        penalty:
+          format: int32
+    Object:
+      properties: {}
+    ResponseApi:
+      example:
+        code: ""
+        data: ""
+        message: ""
+      properties:
+        message: {}
+        data:
+          properties: {}
+        code:
+          format: int32
+
