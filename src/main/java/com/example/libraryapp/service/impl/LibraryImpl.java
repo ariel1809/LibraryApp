@@ -124,7 +124,7 @@ public class LibraryImpl implements LibraryApi {
                 responseApi.setData(null);
                 return new ResponseEntity<>(responseApi, HttpStatus.BAD_REQUEST);
             }
-            if (student.getNbrLoans() > 3){
+            if (student.getNbrLoans() >= 3){
                 responseApi.setMessage("Student has more than 03 loans");
                 responseApi.setCode(CodeEnum.NULL.getCode());
                 responseApi.setData(null);

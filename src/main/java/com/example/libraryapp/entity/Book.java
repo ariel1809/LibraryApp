@@ -28,7 +28,7 @@ public class Book {
     @EqualsAndHashCode.Exclude
     private String rating;
     @EqualsAndHashCode.Exclude
-    private String amount;
+    private Double amount;
     @EqualsAndHashCode.Exclude
     private Integer nbrCopies;
 

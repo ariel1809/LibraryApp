@@ -21,7 +21,7 @@ public class Student {
     @EqualsAndHashCode.Exclude
     private String surname;
     @EqualsAndHashCode.Exclude
-    private int age;
+    private Integer age;
     @EqualsAndHashCode.Exclude
     private String gender;
     @EqualsAndHashCode.Exclude
